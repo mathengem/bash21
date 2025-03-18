@@ -72,6 +72,17 @@ create_addresses_file(){
 ################# MAIN ########################
 ###############################################
 
+# PROMPT USER FOR SALT
+read -sp "Enter your salt (1-128 words): " salt  # -s hides input for security
+echo
+
+# GENERATE ENTROPY (RANDOM) + COMBINE WITH SALT
+entropy=$(cat /dev/urandom | tr -dc '[:graph:]' | fold -w 64 | head -n 1)
+combined_input="${entropy}${salt}"
+
+# DERIVE PRIVATE KEY FROM COMBINED ENTROPY + SALT
+pk=$(echo -n "${combined_input}" | openssl sha256 | awk '{print $2}')
+
 # CONVERT ENTROPY TO WIF KEY
 
 entropy=$(cat /dev/urandom | tr -dc '[:graph:]' | fold -w 64 | head -n 1)
